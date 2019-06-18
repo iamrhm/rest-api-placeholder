@@ -1,6 +1,6 @@
 var route = require('express').Router()
 var coreRoutes = require('./core');
-var mockRoutes = require('./mock')
+var mockRoutes = require('./mockapi')
 
 /* 
 NOTE:  

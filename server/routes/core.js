@@ -37,12 +37,12 @@ coreRoutes.post('/addendpoint/:projectname', (req, res) => {
     response: req.body.response,
     method: req.body.method,
   }
-  var projectName = req.params.projectname
+  var projectname = req.params.projectname
 
   if (data.endpoint !== undefined && data.response !== undefined
-    && data.method !== undefined && projectName !== undefined) {
+    && data.method !== undefined && projectname !== undefined) {
 
-    var project = utils.addEndPoint(projectName, data)
+    var project = utils.addEndPoint(projectname, data)
     project.then((successMsg) => {
       res.status(SUCCESS_STATUS)
       res.send(successMsg)
@@ -58,20 +58,20 @@ coreRoutes.post('/addendpoint/:projectname', (req, res) => {
 
 /* 
 NOTE:  
-ENDPOINT : /endpoint
+ENDPOINT : /endpoint/:projectname
 PURPOSE : Edit endpoints of a project
 CORE ROUTE: Y
 */
 coreRoutes.put('/endpoint/:projectname', (req, res) => {
-  var projectName = req.params.projectname;
+  var projectname = req.params.projectname;
   var data = {
     endpoint: req.body.endpoint,
     status: req.body.status,
     response: req.body.response,
     method: req.body.method,
   }
-  if (projectName !== undefined && projectName !== null && projectName !== '') {
-    var editedData = utils.editEndPoint(projectName, data)
+  if (projectname !== undefined && projectname !== null && projectname !== '') {
+    var editedData = utils.editEndPoint(projectname, data)
     editedData.then((data) => {
       res.status(SUCCESS_STATUS)
       res.send(data)
@@ -113,6 +113,46 @@ CORE ROUTE: Y
 coreRoutes.get('/getProject/:projectname', (req, res) => {
   console.log(req.params.projectname)
   res.send(req.params.projectname)
+})
+
+/* 
+NOTE:  
+ENDPOINT : /delete/projectname
+PURPOSE : delete an endpoint
+CORE ROUTE: Y
+*/
+
+coreRoutes.delete('delete/:projectname', (req, res) => {
+  var projectname = req.params.projectname
+  if (projectname !== undefined && projectname !== null && projectname !== '') {
+    var data = req.body;
+    var isEndpointDeleted = utils.deleteEndPoint(projectNam, data);
+    isEndpointDeleted.then((successMsg) => {
+      res.status(200)
+      res.send(SUCCESS_STATUS)
+    }).catch((errMsg) => {
+      res.status(ERROR_STATUS)
+      res.send(err)
+    })
+  }
+})
+
+/* 
+NOTE:  
+ENDPOINT : /delete/project
+PURPOSE : delete a project
+CORE ROUTE: Y
+*/
+
+coreRoutes.delete('delete/project', (req, res) => {
+  var data = req.data
+  utils.deleteProject(data).then((successMsg) => {
+    res.status(SUCCESS_STATUS)
+    res.send(successMsg)
+  }).catch((errMsg) => {
+    res.status(ERROR_STATUS)
+    res.send(errMsg)
+  })
 })
 
 module.exports = coreRoutes      
