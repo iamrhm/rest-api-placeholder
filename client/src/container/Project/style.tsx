@@ -11,10 +11,8 @@ export const StyledListContainer = styled.div`
 `
 
 export const StyledFooter = styled.div`
-  width: 70%;
-  height: 128px;
-  bottom: 0;
-  position: fixed;
-  z-index: 3;
-  padding: 0% 15%;
+  bottom: 10%;
+  position: absolute;
+  left: 78%;
+  z-index:4;
 `

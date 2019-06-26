@@ -71,12 +71,14 @@ export const StyledDropDown = styled.select`
   text-align-last:center;
 `
 export const StyledTextContainer = styled.div`
-  width: 70%;
-  border-radius:5px;
-  font-size: 18px;
+  width: 62%;
+  padding:4% 0%;
+  font-size: 16px;
   font-family: 'Open Sans';
   color:#403d3d;
   word-wrap: break-word;
+  white-space: pre-line;
+  text-align:left;
 `
 export const StyledContainer = styled.div`
   position: relative;

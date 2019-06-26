@@ -70,7 +70,6 @@ export const StyledDefaultButton = styled.button`
   :focus{
     outline:none;
   };
-  padding:2%;
   box-shadow:  ${(props: IProps) =>
     (props.boxShadow !== undefined ? props.boxShadow : '')};
   border-radius:  ${(props: IProps) =>
@@ -78,6 +77,10 @@ export const StyledDefaultButton = styled.button`
   :active{
     transform:scale(.95)
   }
+  font-size: 18px;
+  font-family: 'Open Sans';
+  padding: 5%;
+  color: #403d3de3;
 `
 export const StyledRoundButton = styled.button`
   width: ${(props: IProps) =>

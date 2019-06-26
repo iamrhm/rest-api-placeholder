@@ -21,22 +21,23 @@ import EndpointDetails from '../../model/endpoint'
 
 interface IProps {
   endpointDetails: EndpointDetails,
+  index: number,
+
   onClick: Function,
+  toggleActiveIndex: Function,
+
   openMenu: boolean,
   showResponse: boolean,
   editMode: boolean,
-  index: number,
-  toggleActiveIndex: Function,
+
   updateEndpoint?: EndpointDetails,
   onChange?: Function,
-  onUpdateErrorMsg?: string,
-  activeButton?: string,
+  onUpdateErrorMsg?: string
 }
 
 const EndpointList: React.FC<IProps> = ({
-  endpointDetails, onClick, openMenu,
-  showResponse, editMode, index, toggleActiveIndex,
-  updateEndpoint, onChange, onUpdateErrorMsg, activeButton }) => (
+  endpointDetails, index, toggleActiveIndex, onClick, openMenu,
+  showResponse, editMode, updateEndpoint, onChange, onUpdateErrorMsg }) => (
     <StyledContainer>
       <StyledEndpointList>
         <StyledRow>
@@ -58,7 +59,7 @@ const EndpointList: React.FC<IProps> = ({
           </StyledSmallCloumn>
         </StyledRow>
         {
-          showResponse && editMode === false &&
+          openMenu && showResponse && !editMode &&
           <StyledEditor>
             <StyledDropDown>
               <option>{endpointDetails.status}</option>
@@ -70,10 +71,11 @@ const EndpointList: React.FC<IProps> = ({
             </StyledTextContainer>
           </StyledEditor>
         }
+
         {
-          editMode === true &&
-          (updateEndpoint !== undefined) &&
+          editMode && !showResponse && (updateEndpoint !== undefined) &&
           (onChange !== undefined) &&
+
           <ResponseForm
             inputparams={updateEndpoint}
             onChange={onChange}
@@ -87,7 +89,8 @@ const EndpointList: React.FC<IProps> = ({
         {
           openMenu &&
           <SidePanel
-            activeButton={activeButton}
+            isShowResponseActive = {showResponse}
+            isEditModeActive = {editMode}
             onClick={onClick} />
         }
       </div>

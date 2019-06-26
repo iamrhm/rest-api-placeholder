@@ -14,7 +14,8 @@ const UpdateButton: React.FC <IProps>= ({float,onClick}) =>(
     borderRadius='5px'
     onClick={(e)=>onClick(e,'update')}
   >
-    <StyledUpdateIcon />
+    {/* <StyledUpdateIcon /> */}
+    UPDATE
   </StyledDefaultButton>
 )
 

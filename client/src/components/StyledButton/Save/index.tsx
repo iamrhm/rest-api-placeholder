@@ -11,7 +11,8 @@ const SaveButton: React.FC<IProps> = ({ onClick }) => (
     boxShadow='-1px 1px 5px 0px #ccc, 1px 1px 5px 0px #ccc'
     borderRadius='5px'
     onClick={(e: any) => onClick(e, 'save')}>
-    <StyledSaveIcon />
+    {/* <StyledSaveIcon /> */}
+    SAVE
   </StyledDefaultButton>
 )
 export default SaveButton

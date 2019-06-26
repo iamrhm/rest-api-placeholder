@@ -1,27 +1,28 @@
 import React from 'react'
 
 import { StyledSidePanel } from './styled'
-import DeleteButton from '../StyledSwitch/Delete'
-import EditButton from '../StyledSwitch/Edit'
-import ShowButton from '../StyledSwitch/Show'
+import DeleteButton from '../StyledButton/Delete'
+import EditButton from '../StyledButton/Edit'
+import ShowButton from '../StyledButton/Show'
 
 interface IProps {
   onClick: Function,
-  activeButton?: string,
+  isShowResponseActive: boolean,
+  isEditModeActive: boolean,
 }
 
-const SidePanel: React.FC<IProps> = ({ onClick,activeButton }) => (
+const SidePanel: React.FC<IProps> = ({ onClick, isShowResponseActive, isEditModeActive }) => (
   <StyledSidePanel>
     <ShowButton
-      active={activeButton === 'SHOW' ? true : false}
+      active={isShowResponseActive}
       onClick={onClick}
     />
     <EditButton
-      active={activeButton === 'EDIT' ? true : false}
+      active={isEditModeActive}
       onClick={onClick}
     />
     <DeleteButton
-      active={activeButton === 'DELETE' ? true : false}
+      active={false}
       onClick={onClick}
     />
   </StyledSidePanel>

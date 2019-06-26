@@ -2,20 +2,20 @@ import React from 'react';
 
 import { StyledList, StyledHeader, StyledPara } from "./styled";
 
-interface Iprops {
-  name: string,
-  handleClick: Function,
+interface IProps {
+  projectName: string,
+  handleClick?: Function,
 }
 
-const ProjectList: React.FC = () => (
+const ProjectList: React.FC<IProps> = ({ projectName }) => (
   <StyledList>
     <StyledHeader>
-      Lorem Ipsum
-      </StyledHeader>
+      {projectName}
+    </StyledHeader>
     <StyledPara>
-      Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
-      Use As Blog Form
-      </StyledPara>
+      Base URL : <br />
+      <StyledPara>`http://localhost:${window.location.port}/api/${projectName}/mock`</StyledPara>
+    </StyledPara>
   </StyledList>
 )
 

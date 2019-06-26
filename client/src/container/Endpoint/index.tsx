@@ -13,6 +13,8 @@ import EdpointList from '../../components/EndpointList'
 import AddButton from '../../components/StyledButton/Add'
 import EndpointForm from '../../components/Forms/Endpoint'
 import { convertResponseToObj, parseEndpoint } from '../../util'
+
+
 import { endpointList } from '../../__mock__/endpointList'
 
 
@@ -30,7 +32,6 @@ interface IState {
   openForm: boolean,
 
   activeIndex: number,
-  activeButton: string,
 
   endpointInput: EndpointDetails,
   endpointArray: EndpointDetails[]
@@ -58,14 +59,6 @@ function getDefaultUpdatedInput() {
   }
 }
 
-function getActiveButton(prevButton: string, nextButton: string) {
-  const SwitchList = ['EDIT', 'DELETE', 'SHOW', 'MENU'];
-  let activeButton =
-    prevButton.toUpperCase() !== nextButton.toUpperCase() &&
-      SwitchList.indexOf(nextButton.toUpperCase()) >= 0 ? nextButton : 'none'
-  return activeButton
-}
-
 class Endpoint extends Component<IProps, IState> {
   state: IState
   constructor(props: IProps) {
@@ -77,7 +70,6 @@ class Endpoint extends Component<IProps, IState> {
       openForm: false,
 
       activeIndex: 0,
-      activeButton: 'none',
 
       endpointArray: parseEndpoint(endpointList),
 
@@ -101,29 +93,21 @@ class Endpoint extends Component<IProps, IState> {
   }
 
   handleClick = (e: any, targetEl: string) => {
-    const { activeButton } = this.state
     e.preventDefault()
-    //Switch
     if (targetEl.toUpperCase() === 'SHOW') {
       this.setState({
         showResponse: !this.state.showResponse,
-        activeButton: getActiveButton(activeButton, 'SHOW'),
         editMode: false
       })
     }
     else if (targetEl.toUpperCase() === 'EDIT') {
-      this.editEndpoint()
+      this.handleEdit()
     }
     else if (targetEl.toUpperCase() === 'DELETE') {
-      this.setState({
-        activeButton: getActiveButton(activeButton, 'DELETE')
-      })
     }
-    //Buttons
     else if (targetEl.toUpperCase() === 'ADD') {
       this.setState({
         openForm: !this.state.openForm,
-        activeButton: getActiveButton(activeButton, 'ADD'),
       })
     }
     else if (targetEl.toUpperCase() === 'SAVE') {
@@ -135,7 +119,6 @@ class Endpoint extends Component<IProps, IState> {
   }
 
   validateAndSave = (endpointInput: EndpointDetails) => {
-    const { activeButton } = this.state
     if (endpointInput) {
       let newErrorMsg = ''
       if (endpointInput.endpoint.trim().length > 0) {
@@ -152,7 +135,6 @@ class Endpoint extends Component<IProps, IState> {
             this.setState({
               endpointInput: getDefaultEndpoinInput(),
               openForm: false,
-              activeButton: getActiveButton(activeButton, 'SAVE'),
             })
           } else {
             newErrorMsg = responseObj.errorMsg
@@ -165,7 +147,6 @@ class Endpoint extends Component<IProps, IState> {
       }
       this.setState({
         errorMsg: newErrorMsg,
-        activeButton: getActiveButton(activeButton, 'SAVE')
       })
     }
   }
@@ -194,31 +175,24 @@ class Endpoint extends Component<IProps, IState> {
 
   toggleActiveIndex = (e: any, currentIndex: number) => {
     e.preventDefault()
-    const { activeButton } = this.state
     if (this.state.activeIndex !== currentIndex) {
       this.setState({
         activeIndex: currentIndex,
         openMenu: true,
-        activeButton: getActiveButton(activeButton, 'MENU')
+        editMode: false,
+        showResponse: false
       })
     } else {
       this.setState({
         openMenu: !this.state.openMenu,
         showResponse: false,
         editMode: false,
-        activeButton: getActiveButton(activeButton, 'MENU')
       })
     }
   }
 
-  editEndpoint = () => {
-    const { activeButton } = this.state
-    let defaultUpdateEndpointDetails = {
-      endpoint: '',
-      status: 0,
-      response: '',
-      method: ''
-    }
+  handleEdit = () => {
+    let defaultUpdateEndpointDetails = getDefaultUpdatedInput()
     if (!this.state.editMode) {
       const { endpointArray, activeIndex } = this.state
       let newEndpointDetails = endpointArray.find((data, index) => (index === activeIndex))
@@ -227,16 +201,14 @@ class Endpoint extends Component<IProps, IState> {
           editMode: true,
           showResponse: false,
           updateEndpoint: newEndpointDetails,
-          activeButton: getActiveButton(activeButton, 'EDIT')
         })
     } else {
       this.setState({
         editMode: false,
+        showResponse: false,
         updateEndpoint: defaultUpdateEndpointDetails,
-        activeButton: getActiveButton(activeButton, 'EDIT')
       })
     }
-
   }
 
   handleUpdate = (e: any, elType: string) => {
@@ -264,7 +236,6 @@ class Endpoint extends Component<IProps, IState> {
   }
 
   validateAndUpdate = (endpointInput: EndpointDetails) => {
-    const { activeButton } = this.state
     if (endpointInput) {
       let newErrorMsg = ''
       if (endpointInput.endpoint.trim().length > 0) {
@@ -281,7 +252,6 @@ class Endpoint extends Component<IProps, IState> {
             this.setState({
               updateEndpoint: getDefaultUpdatedInput(),
               editMode: false,
-              activeButton: getActiveButton(activeButton, 'UPDATE')
             })
           } else {
             newErrorMsg = responseObj.errorMsg
@@ -294,14 +264,13 @@ class Endpoint extends Component<IProps, IState> {
       }
       this.setState({
         onUpdateErrorMsg: newErrorMsg,
-        activeButton: getActiveButton(activeButton, 'UPDATE')
       })
     }
   }
 
   render() {
     const { openMenu, showResponse, editMode,
-      activeIndex, updateEndpoint, onUpdateErrorMsg, activeButton } = this.state
+      activeIndex, updateEndpoint, onUpdateErrorMsg } = this.state
     return (
       <StyledAppWrapper>
         <StyledHeader>
@@ -311,32 +280,26 @@ class Endpoint extends Component<IProps, IState> {
           <StyledEndpointContainer>
             {
               this.state.endpointArray.map((data, index) => {
-                return index === activeIndex ?
+                return (
+
                   <EdpointList
                     endpointDetails={data}
                     index={index}
                     key={index}
-                    openMenu={openMenu}
-                    showResponse={showResponse}
-                    editMode={editMode}
+
                     onClick={this.handleClick}
                     toggleActiveIndex={this.toggleActiveIndex}
-                    updateEndpoint={updateEndpoint}
+
+                    openMenu={openMenu && (index === activeIndex)}
+                    showResponse={showResponse && (index === activeIndex)}
+                    editMode={editMode && (index === activeIndex)}
+
+                    updateEndpoint={editMode ? updateEndpoint : undefined}
                     onChange={this.handleUpdate}
-                    onUpdateErrorMsg={onUpdateErrorMsg}
-                    activeButton={activeButton}
+                    onUpdateErrorMsg={editMode ? onUpdateErrorMsg : undefined}
                   />
-                  :
-                  <EdpointList
-                    endpointDetails={data}
-                    index={index}
-                    key={index}
-                    openMenu={false}
-                    showResponse={false}
-                    editMode={false}
-                    onClick={this.handleClick}
-                    toggleActiveIndex={this.toggleActiveIndex}
-                  />
+
+                )
               })
             }
             {
