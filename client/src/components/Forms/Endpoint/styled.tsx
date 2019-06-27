@@ -14,16 +14,16 @@ export const StyledRow = styled.div`
   align-items: center;
 `
 export const StyledFatColumn = styled.div`
-  width : 80%;
+  width : 68%;
   height: 100px;
   overflow-x:auto;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding: 2% 4%;
+  padding: 0  2%;
 `
 export const StyledSlimCloumn = styled.div`
-  width:20%;
+  width:30%;
   height:100px;
   display:flex;
   flex-direction:column;
@@ -40,6 +40,7 @@ export const StyledEndpointList = styled.div`
   align-items:center;
   border-radius:5px;
   box-shadow: 1px 2px 5px 0px #ccc;
+  background-color:#fff;
 `
 export const StyledContainer = styled.div`
   position: relative;

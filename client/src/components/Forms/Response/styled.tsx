@@ -23,6 +23,7 @@ export const StyledInputContainer = styled.div`
   flex-direction:row;
   align-items:center;
   justify-content:space-around;
+  background-color:#fff;
 `
 export const StyledInputDropDown = styled.select`
   width: 85%;

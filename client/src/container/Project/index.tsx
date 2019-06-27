@@ -16,18 +16,14 @@ interface IProps {
   getProjectName: Function,
   deleteProject: Function
 }
+
 interface IState {
   projectNames: string[],
   openForm: boolean,
-  newProject: {
-    name: string,
-  }
+  projectName: string,
+  errorMsg: string
 }
-function defaultNewProject() {
-  return {
-    name: '',
-  }
-}
+
 class Project extends Component<IProps, IState> {
 
   constructor(props: IProps) {
@@ -35,9 +31,8 @@ class Project extends Component<IProps, IState> {
     this.state = {
       projectNames: ['Project One', 'Project Two', 'Project Three'],
       openForm: false,
-      newProject: {
-        name: ''
-      }
+      projectName: '',
+      errorMsg: ''
     }
   }
 
@@ -46,29 +41,45 @@ class Project extends Component<IProps, IState> {
       if (this.state.openForm) {
         this.setState({
           openForm: false,
-          newProject: defaultNewProject()
+          projectName: ''
         })
       } else {
         this.setState({
           openForm: true,
-          newProject: defaultNewProject()
+          projectName: ''
         })
       }
     }
+    else if (targetEl.toUpperCase() === 'SAVE') {
+      this.validateAndSave()
+    }
   }
+
   handleChange = (e: any, targetEl: string) => {
-    let value=e.target.value;
-    if(value!==undefined){
+    let value = e.target.value;
+    if (value !== undefined) {
       this.setState({
-        newProject:{
-          name:value,
-        }
+        projectName: value
+      })
+    }
+  }
+
+  validateAndSave = () => {
+    const { projectName } = this.state
+    if (projectName !== undefined && projectName !== '') {
+      console.log(projectName) //dispatch save project
+      this.setState({
+        openForm:false
+      })
+    } else {
+      this.setState({
+        errorMsg: 'invalid input'
       })
     }
   }
 
   render() {
-    const { projectNames, openForm, newProject } = this.state
+    const { projectNames, openForm, projectName, errorMsg } = this.state
     return (
       <StyledAppWrapper>
         <StyledHeader>
@@ -84,8 +95,10 @@ class Project extends Component<IProps, IState> {
             {
               openForm &&
               <ProjectForm
-                projectInput={newProject}
-                onChange={this.handleChange} />
+                projectName={projectName}
+                onChange={this.handleChange}
+                onClick={this.handleClick}
+                errorMsg={errorMsg} />
             }
             <StyledFooter>
               <AddButton

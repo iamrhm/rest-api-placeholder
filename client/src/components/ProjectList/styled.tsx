@@ -13,29 +13,31 @@ export const StyledList = styled.div`
     box-shadow: 4px 5px 6px 1px #ccc, -2px 3px 6px 1px #ccc;
   };
   cursor: pointer;
+  background-color:#fff;
 `
 
 export const StyledHeader = styled.div`
   width: 92%;
   height: 30%;
   font-family: 'Open Sans';
-  font-size: 28px;
-  color: #404040f0;
+  font-size: 20px;
   padding: 0 4%;
   display:flex;
   justify-content: left;
   align-items:center;
   background-color: transparent;
+  color:#424040;
 `
 
 export const StyledPara = styled.p`
   width: 92%;
   height: 70%;
   font-family: 'Open Sans';
-  font-size: 20px;
+  font-size: 17px;
   color: #3c3939f0;
   padding: 0 4%;
   word-wrap: break-word;
   margin:0;
+  color: #272727c4;
 `
 

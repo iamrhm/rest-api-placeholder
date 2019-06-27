@@ -7,6 +7,8 @@ import { Menu } from 'styled-icons/feather/Menu'
 import { Save } from 'styled-icons/feather/Save'
 import { Update } from 'styled-icons/material/Update'
 import { Close } from 'styled-icons/material/Close'
+import { Link2 as LinkIcon } from 'styled-icons/feather/Link2'
+import { Done } from 'styled-icons/material/Done'
 
 const DefaultIcon = {
   width: '48%',
@@ -148,7 +150,7 @@ export const StyledAddIcon = styled(Add)`
   height: ${(props: IProps) =>
     (props.height !== undefined ? props.height : DefaultIcon.height)};
   color: ${(props: IProps) => (props.active ? '#2196f3b3' : '#949292')};
-  transform: ${(props: IProps) => (props.active ? 'rotate(45deg)' : '')}
+  transform: ${(props: IProps) => (props.active ? 'rotate(45deg)' : '')};
 `
 
 export const StyledUpdateIcon = styled(Update)`
@@ -164,4 +166,15 @@ export const StyledCloseIcon = styled(Close)`
   height: ${(props: IProps) =>
     (props.height !== undefined ? props.height : DefaultIcon.height)};
   color: ${(props: IProps) => (props.active ? '#2196f3b3' : '#949292')};
+`
+
+export const StyledLinkIcon = styled(LinkIcon)`
+  width:20px;
+  height:20px;
+  color:#2196f3b3;
+`
+export const StyledDoneIcon = styled(Done)`
+  width:20px;
+  height:20px;
+  color:#2196f3b3
 `

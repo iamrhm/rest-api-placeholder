@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { StyledList, StyledHeader, StyledPara } from "./styled";
+import { StyledLinkIcon } from '../Util/Styled'
 
 interface IProps {
   projectName: string,
@@ -13,8 +14,7 @@ const ProjectList: React.FC<IProps> = ({ projectName }) => (
       {projectName}
     </StyledHeader>
     <StyledPara>
-      Base URL : <br />
-      <StyledPara>`http://localhost:${window.location.port}/api/${projectName}/mock`</StyledPara>
+      <StyledLinkIcon/> {`http://localhost:${window.location.port}/api/${projectName}/mock`}
     </StyledPara>
   </StyledList>
 )

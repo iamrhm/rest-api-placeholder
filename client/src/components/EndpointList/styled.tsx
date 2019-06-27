@@ -43,6 +43,7 @@ export const StyledEndpointList = styled.div`
   :hover{
     box-shadow:-1px 5px 7px 0px #ccc, 2px 5px 7px 0px #ccc
   }
+  background-color:#fff;
 `
 export const StyledEditor = styled.div`
   width: 100%;
@@ -78,7 +79,9 @@ export const StyledTextContainer = styled.div`
   color:#403d3d;
   word-wrap: break-word;
   white-space: pre-line;
-  text-align:left;
+  text-align: center;
+  line-height: 1.5em;
+  background: #403d3d0f;
 `
 export const StyledContainer = styled.div`
   position: relative;
