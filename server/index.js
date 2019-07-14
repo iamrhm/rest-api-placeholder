@@ -1,6 +1,6 @@
 var express = require('express')
 var app = express()
-var PORT = 4001 || process.env.PORT
+var PORT = 4000 || process.env.PORT
 var bodyParser = require('body-parser')
 var routes = require('./routes')
 var mongoose = require('mongoose')

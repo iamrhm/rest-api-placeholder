@@ -6,6 +6,41 @@ var ERROR_STATUS = 404;
 
 /* 
 NOTE:  
+ENDPOINT : /getprojectnames
+PURPOSE : Default all project names
+CORE ROUTE: Y
+*/
+coreRoutes.get('/getprojectnames', (req, res) => {
+  var allProjects = utils.getAllProjectNames()
+  allProjects.then((projects) => {
+    res.status(SUCCESS_STATUS)
+    res.send(projects)
+  }).catch((err) => {
+    res.status(ERROR_STATUS)
+    res.send(err)
+  })
+})
+
+/* 
+NOTE:  
+ENDPOINT : /getproject/projectname
+PURPOSE : Spefic project details
+CORE ROUTE: Y
+*/
+coreRoutes.get('/getproject/:projectname', (req, res) => {
+  console.log(req.params.projectname)
+  var projectDetailse = utils.getProject(req.params.projectname)
+  projectDetailse.then((data) => {
+    res.status(SUCCESS_STATUS)
+    res.send(data)
+  }).catch((err) => {
+    res.status(ERROR_STATUS)
+    res.send(err)
+  })
+})
+
+/* 
+NOTE:  
 ENDPOINT : /addnewproject 
 PURPOSE : Save New Project Name
 CORE ROUTE: Y
@@ -84,35 +119,6 @@ coreRoutes.put('/endpoint/:projectname', (req, res) => {
     res.status(ERROR_STATUS)
     res.send('Check Project Name')
   }
-})
-
-
-/* 
-NOTE:  
-ENDPOINT : /getProject
-PURPOSE : Default all 
-CORE ROUTE: Y
-*/
-coreRoutes.get('/getProject', (req, res) => {
-  var allProjects = util.getProject()
-  allProjects.then((projects) => {
-    res.status(SUCCESS_STATUS)
-    res.send(projects)
-  }).catch((err) => {
-    res.status(ERROR_STATUS)
-    res.send(err)
-  })
-})
-
-/* 
-NOTE:  
-ENDPOINT : /getProject/projectname
-PURPOSE : Spefic project
-CORE ROUTE: Y
-*/
-coreRoutes.get('/getProject/:projectname', (req, res) => {
-  console.log(req.params.projectname)
-  res.send(req.params.projectname)
 })
 
 /* 

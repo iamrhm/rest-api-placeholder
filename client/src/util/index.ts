@@ -10,7 +10,6 @@ interface ClientEndpointDetails {
 export function isValidJson(response: string) {
   let result: boolean = false
   try {
-    JSON.parse(response)
     result = true
   } catch (e) {
     return result

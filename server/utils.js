@@ -1,6 +1,7 @@
 var Project = require('./db/models/project');
 var DEFAULT_STATUS = 200;
 
+/* ----- Basic Validations ----- */
 var checkIfDataExists = function (data) {
   if (data !== undefined && data !== null && data !== '') {
     return true
@@ -25,6 +26,15 @@ var validateStatus = function (status) {
   }
 
 }
+var isEndpointValid = function (data) {
+  if (!checkIfDataExists(data.endpoint) &&
+    !checkIfDataExists(data.response) &&
+    !checkIfDataExists(data.status) &&
+    !checkIfDataExists(data.method)) {
+    return false
+  }
+  return true
+}
 var validateEndpointDetails = function (data) {
   if (!checkIfDataExists(data.endpoint) &&
     !checkIfDataExists(data.response) &&
@@ -40,7 +50,27 @@ var validateEndpointDetails = function (data) {
   }
 }
 
+/* ---- Filter & Convert Data For Client ---- */
 
+var filterProjectDetails = function (projectDetails) {
+  var newProjectDetails = { name: projectDetails.name, endpointlist: [] }
+  if (projectDetails.endpointlist !== undefined && projectDetails.endpointlist.length > 0) {
+    newProjectDetails.endpointlist = projectDetails.endpointlist.map((data) => {
+      return {
+        endpoint: data.endpoint,
+        status: data.status,
+        response: JSON.stringify(data.response, null, 2),
+        method: data.method
+      }
+    })
+    return newProjectDetails
+  }
+  else {
+    throw error
+  }
+}
+
+/* ------ Logical Part ------ */
 var addNewProject = function (projectname) {
   if (checkIfDataExists(projectname)) {
     return new Promise((resolve, reject) => {
@@ -69,9 +99,10 @@ var addNewProject = function (projectname) {
 }
 
 var addEndPoint = function (projectname, data) {
-  var endpointDetails = validateEndpointDetails(data)
-  if (!endpointDetails)
+  if (!isEndpointValid(data))
     return new Promise.reject(`invalid data`)
+    
+  var endpointDetails = validateEndpointDetails(data)
   return new Promise((resolve, reject) => {
     Project.findOne({ name: projectname })
       .then((data) => {
@@ -98,30 +129,35 @@ var addEndPoint = function (projectname, data) {
   })
 }
 
+var getAllProjectNames = function () {
+  return new Promise((resolve, reject) => {
+    Project.find({}, { _id: 0, name: 1 }).then((projectNames) => {
+      resolve(projectNames)
+    }).catch((err) => {
+      reject('No Project Exists')
+    })
+  })
+}
+
 var getProject = function (projectname) {
   if (checkIfDataExists(projectname)) {
     return new Promise((resolve, reject) => {
-      Project.findOne({ name: projectname }).then((project) => {
-        resolve(project)
+      Project.findOne({ name: projectname }, { _id: 0 }).then((projectDetails) => {
+        resolve(filterProjectDetails(projectDetails))
       }).catch((err) => {
         reject(`${projectname} doesn't exists`)
       })
     })
   } else {
-    return new Promise((resolve, reject) => {
-      Project.find().then((projects) => {
-        resolve(projects)
-      }).catch((err) => {
-        reject('No Project Exists')
-      })
-    })
+    reject(`Invalid projectname`)
   }
 }
 
 var editEndPoint = function (projectname, data) {
-  var endpointDetails = validateEndpointDetails(data)
-  if (!endpointDetails)
+  if (!isEndpointValid(data))
     return new Promise.reject(`invalid data`)
+
+  var endpointDetails = validateEndpointDetails(data)
   return new Promise((resolve, reject) => {
     Project.findOne({ name: projectname }).then((project) => {
       var endpointList = project.endpointlist
@@ -198,4 +234,4 @@ var getResponse = function (projectname, customroute, reqMethod) {
   })
 }
 
-module.exports = { addNewProject, addEndPoint, getResponse, getProject, editEndPoint, deleteEndPoint, deleteProject };
+module.exports = { addNewProject, addEndPoint, getResponse, getProject, editEndPoint, deleteEndPoint, deleteProject, getAllProjectNames };
