@@ -1,43 +1,49 @@
 import EndpointDetails from '../model/endpoint'
 
-interface ResultData {
-  response: object,
-  valid: boolean,
-  errorMsg: string
-}
-
 interface ServerEndpointDetails {
   endpoint: string, status: number, response: object, method: string
 }
+interface ClientEndpointDetails {
+  endpoint: string, status: number, response: string, method: string
+}
 
-
-export function convertResponseToObj(response: string) {
-  let newResult: ResultData = {
-    response: {},
-    valid: true,
-    errorMsg: ''
-  }
+export function isValidJson(response: string) {
+  let result: boolean = false
   try {
-    newResult.response = JSON.parse(response)
+    JSON.parse(response)
+    result = true
   } catch (e) {
-    newResult.valid = false
-    newResult.errorMsg = 'Invalid JSON input'
-    return newResult
+    return result
   }
-  return newResult
+  return result
 }
 
 
-export function parseEndpoint(endpointArray: ServerEndpointDetails[]) {
+export function parseServerToClientEndpointList(endpointArray: ServerEndpointDetails[]) {
   let parsedEndpointArray: EndpointDetails[]
   parsedEndpointArray = endpointArray.map((data) => {
-    let newData = {
-      endpoint: data.endpoint, 
-      status: data.status, 
-      response: JSON.stringify(data.response, null, 2), 
-      method: data.method
-    }
-    return newData
-  })
+    return parseServerToClient(data)
+  }
+  )
   return parsedEndpointArray
+}
+
+export function parseServerToClient(serverEndpoint: ServerEndpointDetails) {
+  let clientEndpoint = {
+    endpoint: serverEndpoint.endpoint,
+    status: serverEndpoint.status,
+    response: JSON.stringify(serverEndpoint.response, null, 2),
+    method: serverEndpoint.method
+  }
+  return clientEndpoint
+}
+
+export function parseClientToServer(clientEndpoint: ClientEndpointDetails) {
+  let serverEndpoint = {
+    endpoint: clientEndpoint.endpoint,
+    status: clientEndpoint.status,
+    response: JSON.parse(clientEndpoint.response),
+    method: clientEndpoint.method
+  }
+  return serverEndpoint
 }

@@ -1,100 +1,67 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import {
   StyledLargeColumn,
   StyledSmallCloumn,
   StyledRow,
-  StyledEditor,
   StyledEndpointList,
-  StyledDropDown,
-  StyledTextContainer,
   StyledContainer,
 } from "./styled";
 
 
-import MenuButton from '../StyledButton/Menu'
+import MenuButton from '../__StyledButton/Menu'
 import SidePanel from '../SidePanel'
-import ResponseForm from '../Forms/Response'
-import CloseButton from '../StyledButton/Close'
 
 import EndpointDetails from '../../model/endpoint'
 
 interface IProps {
   endpointDetails: EndpointDetails,
   index: number,
-
-  onClick: Function,
+  activeState: boolean,
   toggleActiveIndex: Function,
+  toggleMode: Function,
+  mode: string
 
-  openMenu: boolean,
-  showResponse: boolean,
-  editMode: boolean,
-
-  updateEndpoint?: EndpointDetails,
-  onChange?: Function,
-  onUpdateErrorMsg?: string
+  children: ReactNode,
 }
 
 const EndpointList: React.FC<IProps> = ({
-  endpointDetails, index, toggleActiveIndex, onClick, openMenu,
-  showResponse, editMode, updateEndpoint, onChange, onUpdateErrorMsg }) => (
+  endpointDetails, index, activeState, toggleActiveIndex, toggleMode, mode, children }) => {
+
+  function renderConditionalSidebar() {
+    if (activeState)
+      return (
+        <SidePanel
+          mode={mode}
+          onClick={toggleMode} />
+      )
+    else
+      return null
+  }
+
+  return (
     <StyledContainer>
       <StyledEndpointList>
+
         <StyledRow>
           <StyledSmallCloumn>{endpointDetails.method}</StyledSmallCloumn>
           <StyledLargeColumn>{endpointDetails.endpoint}</StyledLargeColumn>
           <StyledSmallCloumn>
-            {
-              openMenu ?
-                <CloseButton
-                  active={true}
-                  onClick={(e: any) => (toggleActiveIndex(e, index))}
-                />
-                :
-                <MenuButton
-                  active={false}
-                  onClick={(e: any) => (toggleActiveIndex(e, index))}
-                />
-            }
+            <MenuButton
+              active={activeState}
+              onClick={() => (toggleActiveIndex(index))}
+            />
           </StyledSmallCloumn>
         </StyledRow>
-        {
-          openMenu && showResponse && !editMode &&
-          <StyledEditor>
-            <StyledDropDown>
-              <option>{endpointDetails.status}</option>
-            </StyledDropDown>
-            <StyledTextContainer>
-              <code>
-                {endpointDetails.response}
-              </code>
-            </StyledTextContainer>
-          </StyledEditor>
-        }
 
-        {
-          editMode && !showResponse && (updateEndpoint !== undefined) &&
-          (onChange !== undefined) &&
+        {children}
 
-          <ResponseForm
-            inputparams={updateEndpoint}
-            onChange={onChange}
-            onClick={onClick}
-            errorMsg={onUpdateErrorMsg !== undefined ? onUpdateErrorMsg : ''}
-            updateFlag={true}
-          />
-        }
       </StyledEndpointList>
+
       <div>
-        {
-          openMenu &&
-          <SidePanel
-            isShowResponseActive = {showResponse}
-            isEditModeActive = {editMode}
-            onClick={onClick} />
-        }
+        {renderConditionalSidebar()}
       </div>
     </StyledContainer>
   )
-
+}
 export default EndpointList

@@ -1,115 +1,147 @@
-import React, { Component } from 'react';
+import React, { useReducer } from 'react';
+
+
+import { StyledHeader, StyledContainer, StyledAppWrapper } from '../../components/Util/Styled/containers'
+import { StyledListContainer, StyledFooter } from './style'
+
 import SearchBar from '../../components/Searchbar';
-
-import { StyledHeader, StyledContainer, StyledAppWrapper } from '../../components/Util/Styled'
-import {
-  StyledListContainer,
-  StyledFooter,
-} from './style'
-
 import ProjectList from '../../components/ProjectList'
-import ProjectForm from '../../components/Forms/Project'
-import AddButton from '../../components/StyledButton/Add'
+import ProjectForm from '../../components/__Forms/Project'
+import AddButton from '../../components/__StyledButton/Add'
+import Loader from '../../components/Loader'
+import { MessageTemplate } from '../../components/Template'
 
 interface IProps {
-  projectNames?: string[],
-  getProjectName: Function,
-  deleteProject: Function
+  propsProjectNames?: string[],
+  getProjectName?: Function,
+  deleteProject?: Function,
+  history: {
+    push: Function
+  }
 }
 
 interface IState {
-  projectNames: string[],
+  projectNames: string[] | undefined,
   openForm: boolean,
   projectName: string,
   errorMsg: string
 }
 
-class Project extends Component<IProps, IState> {
 
-  constructor(props: IProps) {
-    super(props)
-    this.state = {
-      projectNames: ['Project One', 'Project Two', 'Project Three'],
-      openForm: false,
-      projectName: '',
-      errorMsg: ''
+const Project: React.FC<IProps> = ({ propsProjectNames = {}, history }) => {
+  const defaultState: IState = {
+    projectNames: [],
+    openForm: false,
+    projectName: '',
+    errorMsg: ''
+  }
+
+  function reducer(currentState: IState, state: {}) {
+    return Object.assign({}, currentState, state)
+  }
+  const [state, setState] = useReducer(reducer, defaultState)
+  const { projectNames, openForm, projectName, errorMsg } = state
+
+  function addProject() {
+    if (openForm) {
+      setState({
+        openForm: false,
+        projectName: ''
+      })
+    } else {
+      setState({
+        openForm: true,
+        projectName: ''
+      })
     }
   }
 
-  handleClick = (e: any, targetEl: string) => {
-    if (targetEl.toUpperCase() === 'ADD') {
-      if (this.state.openForm) {
-        this.setState({
-          openForm: false,
-          projectName: ''
-        })
-      } else {
-        this.setState({
-          openForm: true,
-          projectName: ''
-        })
-      }
-    }
-    else if (targetEl.toUpperCase() === 'SAVE') {
-      this.validateAndSave()
-    }
-  }
-
-  handleChange = (e: any, targetEl: string) => {
+  function handleChange(e: any) {
     let value = e.target.value;
     if (value !== undefined) {
-      this.setState({
+      setState({
         projectName: value
       })
     }
   }
-
-  validateAndSave = () => {
-    const { projectName } = this.state
+  function validateAndSave() {
     if (projectName !== undefined && projectName !== '') {
       console.log(projectName) //dispatch save project
-      this.setState({
-        openForm:false
+      setState({
+        openForm: false,
+        errorMsg: ''
       })
     } else {
-      this.setState({
+      setState({
         errorMsg: 'invalid input'
       })
     }
   }
 
-  render() {
-    const { projectNames, openForm, projectName, errorMsg } = this.state
-    return (
-      <StyledAppWrapper>
-        <StyledHeader>
-          <SearchBar />
-        </StyledHeader>
-        <StyledContainer>
-          <StyledListContainer>
-            {
-              projectNames.map((projectName) => (
-                <ProjectList projectName={projectName} />
-              ))
-            }
-            {
-              openForm &&
-              <ProjectForm
-                projectName={projectName}
-                onChange={this.handleChange}
-                onClick={this.handleClick}
-                errorMsg={errorMsg} />
-            }
-            <StyledFooter>
-              <AddButton
-                float='right'
-                active={openForm}
-                onClick={this.handleClick} />
-            </StyledFooter>
-          </StyledListContainer>
-        </StyledContainer>
-      </StyledAppWrapper>
-    )
+  function clearErrorMsg() {
+    setState({
+      errorMsg: ''
+    })
   }
+
+  function handleNavigation(projectName: string) {
+    console.log(projectName)
+    history.push(`/endpoint/${projectName}`)
+  }
+
+  function renderEndpointForm() {
+    if (openForm) {
+      return (
+        <ProjectForm
+          projectName={projectName}
+          onChange={handleChange}
+          onClick={validateAndSave}
+          errorMsg={errorMsg}
+          clearErrorMsg={clearErrorMsg} />
+      )
+    } else {
+      return null
+    }
+  }
+
+  function renderProjectList() {
+    if (projectNames === undefined) {
+      return <Loader />
+    }
+    if (projectNames !== undefined && projectNames !== null && projectNames.length > 0)
+      return (
+        projectNames.map((projectName, index) => (
+          <ProjectList
+            key={index}
+            projectName={projectName}
+            onClick={handleNavigation}
+          />
+        ))
+      )
+    else {
+      return (<MessageTemplate message='Add New Project' />)
+    }
+  }
+
+  return (
+    <StyledAppWrapper>
+      <StyledHeader>
+        <SearchBar />
+      </StyledHeader>
+      <StyledContainer>
+        <StyledListContainer>
+          {renderProjectList()}
+          {renderEndpointForm()}
+          <StyledFooter>
+            <AddButton
+              float='right'
+              active={openForm}
+              onClick={addProject} />
+          </StyledFooter>
+        </StyledListContainer>
+      </StyledContainer>
+    </StyledAppWrapper>
+  )
 }
+
 export default Project

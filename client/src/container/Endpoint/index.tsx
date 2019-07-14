@@ -1,327 +1,262 @@
-import React, { Component } from 'react';
-import SearchBar from '../../components/Searchbar';
-import EndpointDetails from '../../model/endpoint';
+import React, { useReducer } from 'react';
+import { isValidJson, parseServerToClientEndpointList, parseClientToServer } from '../../util'
 
-import { StyledHeader, StyledContainer, StyledAppWrapper } from '../../components/Util/Styled'
 
-import {
-  StyledEndpointContainer,
-  StyledFooter
-} from './style'
+import { StyledHeader, StyledContainer, StyledAppWrapper } from '../../components/Util/Styled/containers'
+import { StyledEndpointContainer, StyledFooter } from './style'
 
 import EdpointList from '../../components/EndpointList'
-import AddButton from '../../components/StyledButton/Add'
-import EndpointForm from '../../components/Forms/Endpoint'
-import { convertResponseToObj, parseEndpoint } from '../../util'
+import AddButton from '../../components/__StyledButton/Add'
+import EndpointForm from '../../components/__Forms/Endpoint'
+import ShowResponse from '../../components/Response'
+import ResponseForm from '../../components/__Forms/Response'
+import SearchBar from '../../components/Searchbar';
+import EndpointDetails from '../../model/endpoint';
+import Loader from '../../components/Loader'
+import { MessageTemplate } from '../../components/Template'
 
-
-import { endpointList } from '../../__mock__/endpointList'
-
+//MOCK FILE
+import { firstEndpointListMock } from '../../__mock__/endpointList'
 
 interface IProps {
-  //endpointList?: EndpointDetails[],
-  updateData: Function,
-  deleteData: Function,
-  addNewData: Function,
+  endpointList: EndpointDetails[],
+  match: {
+    params: {
+      id: string
+    }
+  }
 }
 
 interface IState {
-  openMenu: boolean,
-  editMode: boolean,
-  showResponse: boolean,
-  openForm: boolean,
-
   activeIndex: number,
-
+  endpointArray: EndpointDetails[],
   endpointInput: EndpointDetails,
-  endpointArray: EndpointDetails[]
-  errorMsg: string,
-
-  updateEndpoint: EndpointDetails,
-  onUpdateErrorMsg: string,
+  updatedEndpoint: EndpointDetails,
+  errMsg: string,
+  onUpdateErrMsg: string,
+  openForm: boolean,
+  mode: string,
 }
 
-function getDefaultEndpoinInput() {
-  return {
+const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
+  const defaultInput: EndpointDetails = {
     endpoint: '',
     status: 200,
     response: '',
     method: 'GET'
   }
-}
-
-function getDefaultUpdatedInput() {
-  return {
-    endpoint: '',
-    status: 0,
-    response: '',
-    method: ''
-  }
-}
-
-class Endpoint extends Component<IProps, IState> {
-  state: IState
-  constructor(props: IProps) {
-    super(props)
-    this.state = {
-      openMenu: false,
-      editMode: false,
-      showResponse: false,
-      openForm: false,
-
-      activeIndex: 0,
-
-      endpointArray: parseEndpoint(endpointList),
-
-      endpointInput: {
-        endpoint: '',
-        status: 200,
-        response: '',
-        method: 'GET'
-      },
-      errorMsg: '',
-
-      updateEndpoint: {
-        endpoint: '',
-        status: 0,
-        response: '',
-        method: ''
-      },
-      onUpdateErrorMsg: '',
-
-    }
+  const initialState: IState = {
+    activeIndex: -1,
+    endpointArray: parseServerToClientEndpointList(firstEndpointListMock),
+    endpointInput: defaultInput,
+    updatedEndpoint: defaultInput,
+    errMsg: '',
+    onUpdateErrMsg: '',
+    mode: 'none',
+    openForm: false
   }
 
-  handleClick = (e: any, targetEl: string) => {
-    e.preventDefault()
-    if (targetEl.toUpperCase() === 'SHOW') {
-      this.setState({
-        showResponse: !this.state.showResponse,
-        editMode: false
+  function reducer(currentState: IState, state: {}) {
+    console.log('currentState', JSON.stringify(currentState, null, 2))
+    console.log('state', JSON.stringify(state, null, 2))
+    return Object.assign({}, currentState, state)
+  }
+
+  const [state, setState] = useReducer(reducer, initialState)
+
+  const {
+    activeIndex,
+    endpointArray,
+    endpointInput,
+    updatedEndpoint,
+    errMsg,
+    onUpdateErrMsg,
+    mode,
+    openForm
+  } = state
+
+  function addEndpoint() {
+    setState({
+      openForm: !openForm,
+      endpointInput: defaultInput
+    })
+  }
+
+  function toggleActiveIndex(currentIndex: number) {
+    if (activeIndex === currentIndex) {
+      setState({
+        activeIndex: -1,
+        updatedEndpoint: defaultInput,
+        mode: 'none'
       })
     }
-    else if (targetEl.toUpperCase() === 'EDIT') {
-      this.handleEdit()
-    }
-    else if (targetEl.toUpperCase() === 'DELETE') {
-    }
-    else if (targetEl.toUpperCase() === 'ADD') {
-      this.setState({
-        openForm: !this.state.openForm,
-      })
-    }
-    else if (targetEl.toUpperCase() === 'SAVE') {
-      this.validateAndSave(this.state.endpointInput)
-    }
-    else if (targetEl.toUpperCase() === 'UPDATE') {
-      this.validateAndUpdate(this.state.updateEndpoint)
-    }
-  }
-
-  validateAndSave = (endpointInput: EndpointDetails) => {
-    if (endpointInput) {
-      let newErrorMsg = ''
-      if (endpointInput.endpoint.trim().length > 0) {
-        if (endpointInput.response.trim().length > 0) {
-          let responseObj = convertResponseToObj(endpointInput.response)
-          if (responseObj.valid) {
-            let newEndpointInput = {
-              endpoint: endpointInput.endpoint,
-              method: endpointInput.method,
-              status: endpointInput.status,
-              response: responseObj.response
-            }
-            console.log(newEndpointInput)//dispatch save
-            this.setState({
-              endpointInput: getDefaultEndpoinInput(),
-              openForm: false,
-            })
-          } else {
-            newErrorMsg = responseObj.errorMsg
-          }
-        } else {
-          newErrorMsg = 'invalid response'
-        }
-      } else {
-        newErrorMsg = 'invalid url'
-      }
-      this.setState({
-        errorMsg: newErrorMsg,
-      })
-    }
-  }
-
-  handleChange = (e: any, elType: string) => {
-    let value = e.target.value
-    let newEndpointInput = this.state.endpointInput
-    if (elType) {
-      switch (elType) {
-        case 'endpoint':
-          newEndpointInput.endpoint = value
-          break
-        case 'method':
-          newEndpointInput.method = value
-          break
-        case 'response':
-          newEndpointInput.response = value
-          break
-        case 'status':
-          newEndpointInput.status = value
-          break
-      }
-      this.setState({ endpointInput: newEndpointInput })
-    }
-  }
-
-  toggleActiveIndex = (e: any, currentIndex: number) => {
-    e.preventDefault()
-    if (this.state.activeIndex !== currentIndex) {
-      this.setState({
-        activeIndex: currentIndex,
-        openMenu: true,
-        editMode: false,
-        showResponse: false
-      })
-    } else {
-      this.setState({
-        openMenu: !this.state.openMenu,
-        showResponse: false,
-        editMode: false,
-      })
-    }
-  }
-
-  handleEdit = () => {
-    let defaultUpdateEndpointDetails = getDefaultUpdatedInput()
-    if (!this.state.editMode) {
-      const { endpointArray, activeIndex } = this.state
-      let newEndpointDetails = endpointArray.find((data, index) => (index === activeIndex))
-      if (newEndpointDetails !== undefined)
-        this.setState({
-          editMode: true,
-          showResponse: false,
-          updateEndpoint: newEndpointDetails,
+    else {
+      const currentData = endpointArray.find((data: EndpointDetails, index: number) => (index === currentIndex))
+      if (currentData !== undefined) {
+        setState({
+          activeIndex: currentIndex,
+          updatedEndpoint: currentData,
+          mode: 'none'
         })
-    } else {
-      this.setState({
-        editMode: false,
-        showResponse: false,
-        updateEndpoint: defaultUpdateEndpointDetails,
-      })
-    }
-  }
-
-  handleUpdate = (e: any, elType: string) => {
-    let value = e.target.value
-    let newUpdatedEndpointInput = this.state.updateEndpoint
-    if (elType) {
-      switch (elType) {
-        case 'endpoint':
-          newUpdatedEndpointInput.endpoint = value
-          break
-        case 'method':
-          newUpdatedEndpointInput.method = value
-          break
-        case 'response':
-          newUpdatedEndpointInput.response = value
-          break
-        case 'status':
-          newUpdatedEndpointInput.status = value
-          break
       }
-      this.setState({
-        updateEndpoint: newUpdatedEndpointInput,
-      })
     }
   }
 
-  validateAndUpdate = (endpointInput: EndpointDetails) => {
+  function toggleMode(currentMode: string) {
+    if (mode === currentMode)
+      setState({ mode: 'none' })
+    else
+      setState({ mode: currentMode })
+  }
+
+  function handleChange(e: any, elType: string) {
+    let value: string | number
+    let key: string
+    if (elType) {
+      key = elType
+      value = e.target.value
+      setState({ endpointInput: { [key]: value } })
+    }
+  }
+
+  function validateAndSave() {
+    let newErrorMsg = ''
     if (endpointInput) {
-      let newErrorMsg = ''
       if (endpointInput.endpoint.trim().length > 0) {
         if (endpointInput.response.trim().length > 0) {
-          let responseObj = convertResponseToObj(endpointInput.response)
-          if (responseObj.valid) {
-            let updatedEndpoint = {
-              endpoint: endpointInput.endpoint,
-              method: endpointInput.method,
-              status: endpointInput.status,
-              response: responseObj.response
-            }
-            console.log(updatedEndpoint)//dispatch update
-            this.setState({
-              updateEndpoint: getDefaultUpdatedInput(),
-              editMode: false,
+          if (isValidJson(endpointInput.response)) {
+            console.log(parseClientToServer(endpointInput))//Dispatch Action SAVE
+            setState({
+              openForm: false,
+              endpointInput: defaultInput
             })
           } else {
-            newErrorMsg = responseObj.errorMsg
+            newErrorMsg = 'Invalid JSON'
           }
         } else {
-          newErrorMsg = 'invalid response'
+          newErrorMsg = 'Add response'
         }
       } else {
-        newErrorMsg = 'invalid url'
+        newErrorMsg = 'Invalid endpoint'
       }
-      this.setState({
-        onUpdateErrorMsg: newErrorMsg,
+      setState({ errMsg: newErrorMsg })
+    }
+  }
+
+  function handleUpdate(e: any, elType: string) {
+    let value: string | number
+    let key: string
+    if (elType) {
+      key = elType
+      value = e.target.value
+      setState({
+        updatedEndpoint: { [key]: value }
       })
     }
   }
 
-  render() {
-    const { openMenu, showResponse, editMode,
-      activeIndex, updateEndpoint, onUpdateErrorMsg } = this.state
-    return (
-      <StyledAppWrapper>
-        <StyledHeader>
-          <SearchBar />
-        </StyledHeader>
-        <StyledContainer>
-          <StyledEndpointContainer>
-            {
-              this.state.endpointArray.map((data, index) => {
-                return (
-
-                  <EdpointList
-                    endpointDetails={data}
-                    index={index}
-                    key={index}
-
-                    onClick={this.handleClick}
-                    toggleActiveIndex={this.toggleActiveIndex}
-
-                    openMenu={openMenu && (index === activeIndex)}
-                    showResponse={showResponse && (index === activeIndex)}
-                    editMode={editMode && (index === activeIndex)}
-
-                    updateEndpoint={editMode ? updateEndpoint : undefined}
-                    onChange={this.handleUpdate}
-                    onUpdateErrorMsg={editMode ? onUpdateErrorMsg : undefined}
-                  />
-
-                )
-              })
-            }
-            {
-              this.state.openForm &&
-              <EndpointForm
-                inputparams={this.state.endpointInput}
-                onChange={this.handleChange}
-                onClick={this.handleClick}
-                errorMsg={this.state.errorMsg}
-              />
-            }
-          </StyledEndpointContainer>
-        </StyledContainer>
-        <StyledFooter>
-          <AddButton
-            float='right'
-            onClick={this.handleClick}
-            active={this.state.openForm}
-          />
-        </StyledFooter>
-      </StyledAppWrapper>
-    )
+  function validateAndUpdate() {
+    let newErrorMsg = ''
+    if (updatedEndpoint) {
+      if (updatedEndpoint.response.trim().length > 0) {
+        if (isValidJson(updatedEndpoint.response)) {
+          console.log(parseClientToServer(updatedEndpoint))//Dispatch Action Update
+        } else {
+          newErrorMsg = 'Invalid JSON'
+        }
+      } else {
+        newErrorMsg = 'Add response'
+      }
+      setState({ onUpdateErrMsg: newErrorMsg })
+    }
   }
+
+  function renderConditionalResponseComponent(index: number) {
+    if (activeIndex === index) {
+      let data = endpointArray.find((data, idx) => (idx === activeIndex))
+      if (mode === 'show' && data !== undefined) {
+        return <ShowResponse endpointDetails={data} />
+      }
+      else if (mode === 'edit' && data !== undefined) {
+        return <ResponseForm
+          inputparams={updatedEndpoint}
+          onChange={handleUpdate}
+          onClick={validateAndUpdate}
+          errorMsg={onUpdateErrMsg}
+          clearErrorMsg={(e: any) => setState({ onUpdateErrMsg: '' })}
+        />
+      }
+      else
+        return null
+    }
+    else
+      return null
+  }
+
+  function renderConditionalEndpointInputComponent() {
+    if (openForm) {
+      return <EndpointForm
+        inputparams={endpointInput}
+        onChange={handleChange}
+        onClick={validateAndSave}
+        errorMsg={errMsg}
+        clearErrorMsg={(e: any) => setState({ errMsg: '' })}
+      />
+    } else {
+      return null
+    }
+  }
+
+  function renderEndpointLists() {
+    if (endpointArray === undefined) {
+      return <Loader />
+    }
+    else if (endpointArray !== undefined && endpointArray !== null && endpointArray.length > 0) {
+      let endpointList = endpointArray.map((data, index) => (
+        <EdpointList
+          key={index}
+          endpointDetails={data}
+          index={index}
+          activeState={activeIndex === index}
+          toggleActiveIndex={toggleActiveIndex}
+          toggleMode={toggleMode}
+          mode={mode}
+        >
+          {renderConditionalResponseComponent(index)}
+        </EdpointList>
+      ))
+      return endpointList
+    }
+    else {
+      return (<MessageTemplate message='Add New Endpoint' />)
+    }
+  }
+
+  return (
+    <StyledAppWrapper>
+
+      <StyledHeader>
+        <SearchBar />
+      </StyledHeader>
+
+      <StyledContainer>
+        <StyledEndpointContainer>
+          {renderEndpointLists()}
+          {renderConditionalEndpointInputComponent()}
+        </StyledEndpointContainer>
+      </StyledContainer>
+
+      <StyledFooter>
+        <AddButton
+          float='right'
+          onClick={addEndpoint}
+          active={openForm}
+        />
+      </StyledFooter>
+      
+    </StyledAppWrapper>
+  )
+
 }
+
 export default Endpoint

@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+interface IProps {
+  active: boolean
+}
+
 export const StyledList = styled.div`
   width: 30%;
   height: 220px;
@@ -14,6 +18,7 @@ export const StyledList = styled.div`
   };
   cursor: pointer;
   background-color:#fff;
+  position:relative;
 `
 
 export const StyledHeader = styled.div`
@@ -21,12 +26,13 @@ export const StyledHeader = styled.div`
   height: 30%;
   font-family: 'Open Sans';
   font-size: 20px;
+  color:#424040;
   padding: 0 4%;
   display:flex;
   justify-content: left;
   align-items:center;
   background-color: transparent;
-  color:#424040d9;
+  overflow-y:auto;
 `
 
 export const StyledPara = styled.p`
@@ -38,9 +44,25 @@ export const StyledPara = styled.p`
   padding: 0 4%;
   word-wrap: break-word;
   margin:0;
+  overflow-y:auto;
   color: #272727c4;
 `
-
+export const StyledProjectInput = styled.input`
+  width: 92%;
+  height: 30%;
+  font-family : 'Open Sans';
+  font-size: 20px;
+  color:#424040;
+  border:none;
+  :focus{
+    outline:none;
+  }
+`
+export const SubmitContainer = styled.div`    
+  position: absolute;
+  bottom: 5%;
+  right: 5%;
+`
 export const StyledUrl = styled.span`
   display: block;
   text-align: left;
@@ -48,5 +70,20 @@ export const StyledUrl = styled.span`
   font-size: 13px;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   color: #272727a6;
+`
+
+export const ErrorMsgContainer = styled.div`
+  border-radius: 5px;
+  width: 70%;
+  height: 25%;
+  position: absolute;
+  bottom: 5%;
+  left: 3%;
+  font-size:16px;
+  font-family : 'Open Sans';
+  color: #ffff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 `
 
