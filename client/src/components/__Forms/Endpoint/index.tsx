@@ -10,17 +10,17 @@ import {
   StyledUrlInput,
 } from "./styled";
 
-import EndpointDetails from '../../../model/endpoint'
+import { ClientEndpointDetails } from '../../../model/endpoint'
 import ResponseForm from '../Response'
 
 interface IProps {
-  inputparams: EndpointDetails,
+  inputparams: ClientEndpointDetails,
   onChange: Function,
   onClick: Function,
   errorMsg: string,
-  clearErrorMsg:Function
+  clearErrorMsg: Function
 }
-const EndpointForm: React.FC<IProps> = ({ inputparams, onChange, onClick, errorMsg , clearErrorMsg}) => (
+const EndpointForm: React.FC<IProps> = ({ inputparams, onChange, onClick, errorMsg, clearErrorMsg }) => (
   <StyledContainer>
     <StyledEndpointList>
       <StyledRow>
@@ -30,6 +30,7 @@ const EndpointForm: React.FC<IProps> = ({ inputparams, onChange, onClick, errorM
             onChange={(e) => onChange(e, 'method')}
           >
             <option>GET</option>
+            <option>POST</option>
             <option>PUT</option>
             <option>DELETE</option>
           </StyledInputDropDown>

@@ -3,8 +3,8 @@ import { Search } from 'styled-icons/boxicons-regular/Search';
 
 export const SearchIcon = styled(Search)`
   background-color: white;
-  height:40px;
-  width:40px;
+  height:32px;
+  width:32px;
   color: #949292;
 `
 export const StyledIcon = styled.i`

@@ -1,6 +1,8 @@
-import React, { useReducer } from 'react';
-import { isValidJson, parseServerToClientEndpointList, parseClientToServer } from '../../util'
+import React, { useReducer, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
+import { isValidJson } from '../../util'
 
+import { getEndpointLists, addEndpoint, editEndpoint, deleteEndpoint } from '../../store/action/endpointdetails'
 
 import { StyledHeader, StyledContainer, StyledAppWrapper } from '../../components/Util/Styled/containers'
 import { StyledEndpointContainer, StyledFooter } from './style'
@@ -11,15 +13,13 @@ import EndpointForm from '../../components/__Forms/Endpoint'
 import ShowResponse from '../../components/Response'
 import ResponseForm from '../../components/__Forms/Response'
 import SearchBar from '../../components/Searchbar';
-import EndpointDetails from '../../model/endpoint';
+import { ClientEndpointDetails } from '../../model/endpoint';
+import AppPropType from '../../model/app.state';
 import Loader from '../../components/Loader'
 import { MessageTemplate } from '../../components/Template'
 
-//MOCK FILE
-import { firstEndpointListMock } from '../../__mock__/endpointList'
-
 interface IProps {
-  endpointList: EndpointDetails[],
+  endpointList: ClientEndpointDetails[],
   match: {
     params: {
       id: string
@@ -29,17 +29,16 @@ interface IProps {
 
 interface IState {
   activeIndex: number,
-  endpointArray: EndpointDetails[],
-  endpointInput: EndpointDetails,
-  updatedEndpoint: EndpointDetails,
-  errMsg: string,
+  endpointInput: ClientEndpointDetails,
+  updatedEndpoint: ClientEndpointDetails,
+  vErrorMsg: string,
   onUpdateErrMsg: string,
   openForm: boolean,
   mode: string,
 }
 
-const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
-  const defaultInput: EndpointDetails = {
+const Endpoint: React.FC<IProps> = ({ match }) => {
+  const defaultInput: ClientEndpointDetails = {
     endpoint: '',
     status: 200,
     response: '',
@@ -47,35 +46,39 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
   }
   const initialState: IState = {
     activeIndex: -1,
-    endpointArray: parseServerToClientEndpointList(firstEndpointListMock),
     endpointInput: defaultInput,
     updatedEndpoint: defaultInput,
-    errMsg: '',
+    vErrorMsg: '',
     onUpdateErrMsg: '',
     mode: 'none',
     openForm: false
   }
 
   function reducer(currentState: IState, state: {}) {
-    console.log('currentState', JSON.stringify(currentState, null, 2))
-    console.log('state', JSON.stringify(state, null, 2))
     return Object.assign({}, currentState, state)
   }
-
   const [state, setState] = useReducer(reducer, initialState)
+
+  const { endpointList, fetchError, errorMsg } = useSelector((props: AppPropType) => props.endpointList)
+  const dispatch = useDispatch()
+
+  const projectName = match.params.id
+
+  useEffect(() => {
+    dispatch(getEndpointLists(projectName))
+  }, [])
 
   const {
     activeIndex,
-    endpointArray,
     endpointInput,
     updatedEndpoint,
-    errMsg,
+    vErrorMsg,
     onUpdateErrMsg,
     mode,
     openForm
   } = state
 
-  function addEndpoint() {
+  function toggleForm() {
     setState({
       openForm: !openForm,
       endpointInput: defaultInput
@@ -91,13 +94,15 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
       })
     }
     else {
-      const currentData = endpointArray.find((data: EndpointDetails, index: number) => (index === currentIndex))
-      if (currentData !== undefined) {
-        setState({
-          activeIndex: currentIndex,
-          updatedEndpoint: currentData,
-          mode: 'none'
-        })
+      if (endpointList !== null) {
+        const currentData = endpointList.find((data: ClientEndpointDetails, index: number) => (index === currentIndex))
+        if (currentData !== undefined) {
+          setState({
+            activeIndex: currentIndex,
+            updatedEndpoint: currentData,
+            mode: 'none'
+          })
+        }
       }
     }
   }
@@ -110,12 +115,15 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
   }
 
   function handleChange(e: any, elType: string) {
+    let newEndpoint = endpointInput
     let value: string | number
     let key: string
     if (elType) {
       key = elType
       value = e.target.value
-      setState({ endpointInput: { [key]: value } })
+      setState({
+        endpointInput: Object.assign({}, newEndpoint, { [key]: value })
+      })
     }
   }
 
@@ -125,7 +133,7 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
       if (endpointInput.endpoint.trim().length > 0) {
         if (endpointInput.response.trim().length > 0) {
           if (isValidJson(endpointInput.response)) {
-            console.log(parseClientToServer(endpointInput))//Dispatch Action SAVE
+            dispatch(addEndpoint(projectName, endpointInput))
             setState({
               openForm: false,
               endpointInput: defaultInput
@@ -139,18 +147,19 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
       } else {
         newErrorMsg = 'Invalid endpoint'
       }
-      setState({ errMsg: newErrorMsg })
+      setState({ vErrorMsg: newErrorMsg })
     }
   }
 
   function handleUpdate(e: any, elType: string) {
+    let newUpdatedEndpoint = updatedEndpoint
     let value: string | number
     let key: string
     if (elType) {
       key = elType
       value = e.target.value
       setState({
-        updatedEndpoint: { [key]: value }
+        updatedEndpoint: Object.assign({}, newUpdatedEndpoint, { [key]: value })
       })
     }
   }
@@ -160,7 +169,7 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
     if (updatedEndpoint) {
       if (updatedEndpoint.response.trim().length > 0) {
         if (isValidJson(updatedEndpoint.response)) {
-          console.log(parseClientToServer(updatedEndpoint))//Dispatch Action Update
+          dispatch(editEndpoint(projectName, updatedEndpoint))
         } else {
           newErrorMsg = 'Invalid JSON'
         }
@@ -172,8 +181,8 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
   }
 
   function renderConditionalResponseComponent(index: number) {
-    if (activeIndex === index) {
-      let data = endpointArray.find((data, idx) => (idx === activeIndex))
+    if (activeIndex === index && endpointList !== null) {
+      let data = endpointList.find((data, idx) => (idx === activeIndex))
       if (mode === 'show' && data !== undefined) {
         return <ShowResponse endpointDetails={data} />
       }
@@ -199,8 +208,8 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
         inputparams={endpointInput}
         onChange={handleChange}
         onClick={validateAndSave}
-        errorMsg={errMsg}
-        clearErrorMsg={(e: any) => setState({ errMsg: '' })}
+        errorMsg={vErrorMsg}
+        clearErrorMsg={(e: any) => setState({ vErrorMsg: '' })}
       />
     } else {
       return null
@@ -208,11 +217,13 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
   }
 
   function renderEndpointLists() {
-    if (endpointArray === undefined) {
+    if (fetchError.getEndpointList)
+      return (<MessageTemplate message={errorMsg} />)
+    if (endpointList === undefined || endpointList === null) {
       return <Loader />
     }
-    else if (endpointArray !== undefined && endpointArray !== null && endpointArray.length > 0) {
-      let endpointList = endpointArray.map((data, index) => (
+    else if (endpointList !== null && endpointList.length > 0) {
+      let endpointLists = endpointList.map((data, index) => (
         <EdpointList
           key={index}
           endpointDetails={data}
@@ -225,9 +236,9 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
           {renderConditionalResponseComponent(index)}
         </EdpointList>
       ))
-      return endpointList
+      return endpointLists
     }
-    else {
+    else if (endpointList !== null && endpointList.length <= 0) {
       return (<MessageTemplate message='Add New Endpoint' />)
     }
   }
@@ -249,11 +260,11 @@ const Endpoint: React.FC<IProps> = ({ endpointList, match }) => {
       <StyledFooter>
         <AddButton
           float='right'
-          onClick={addEndpoint}
+          onClick={toggleForm}
           active={openForm}
         />
       </StyledFooter>
-      
+
     </StyledAppWrapper>
   )
 

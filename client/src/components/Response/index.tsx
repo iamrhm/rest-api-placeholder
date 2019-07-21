@@ -6,10 +6,10 @@ import {
   StyledLeftColumn
 } from "./styled";
 
-import EndpointDetails from '../../model/endpoint'
+import { ClientEndpointDetails } from '../../model/endpoint'
 
 interface IProps {
-  endpointDetails: EndpointDetails,
+  endpointDetails: ClientEndpointDetails,
 }
 
 const ShowResponse: React.FC<IProps> = ({ endpointDetails }) => {

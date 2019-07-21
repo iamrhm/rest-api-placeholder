@@ -1,5 +1,8 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 
+import { useSelector, useDispatch } from 'react-redux';
+import AppPropType from '../../model/app.state';
+import { getProjectNames, deleteProject, addProject } from '../../store/action/project'
 
 import { StyledHeader, StyledContainer, StyledAppWrapper } from '../../components/Util/Styled/containers'
 import { StyledListContainer, StyledFooter } from './style'
@@ -12,37 +15,37 @@ import Loader from '../../components/Loader'
 import { MessageTemplate } from '../../components/Template'
 
 interface IProps {
-  propsProjectNames?: string[],
-  getProjectName?: Function,
-  deleteProject?: Function,
   history: {
     push: Function
   }
 }
-
 interface IState {
-  projectNames: string[] | undefined,
   openForm: boolean,
   projectName: string,
-  errorMsg: string
+  vErrorMsg: string
 }
 
-
-const Project: React.FC<IProps> = ({ propsProjectNames = {}, history }) => {
+const Project: React.FC<IProps> = ({ history }) => {
   const defaultState: IState = {
-    projectNames: [],
     openForm: false,
     projectName: '',
-    errorMsg: ''
+    vErrorMsg: ''
   }
 
   function reducer(currentState: IState, state: {}) {
     return Object.assign({}, currentState, state)
   }
   const [state, setState] = useReducer(reducer, defaultState)
-  const { projectNames, openForm, projectName, errorMsg } = state
 
-  function addProject() {
+  const { projectNames, fetchError, errorMsg } = useSelector((props: AppPropType) => props.projectList)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getProjectNames())
+  }, [])
+  const { openForm, projectName, vErrorMsg } = state
+
+  function toggleForm() {
     if (openForm) {
       setState({
         openForm: false,
@@ -64,29 +67,32 @@ const Project: React.FC<IProps> = ({ propsProjectNames = {}, history }) => {
       })
     }
   }
+
   function validateAndSave() {
     if (projectName !== undefined && projectName !== '') {
-      console.log(projectName) //dispatch save project
+      dispatch(addProject(projectName))
       setState({
         openForm: false,
-        errorMsg: ''
+        vErrorMsg: ''
       })
     } else {
       setState({
-        errorMsg: 'invalid input'
+        vErrorMsg: 'invalid input'
       })
     }
   }
 
   function clearErrorMsg() {
-    setState({
-      errorMsg: ''
-    })
+    setState({ vErrorMsg: '' })
   }
 
   function handleNavigation(projectName: string) {
-    console.log(projectName)
     history.push(`/endpoint/${projectName}`)
+  }
+
+  function handleDeleteProject(projectName: string) {
+    if (projectName)
+      dispatch(deleteProject(projectName))
   }
 
   function renderEndpointForm() {
@@ -96,7 +102,7 @@ const Project: React.FC<IProps> = ({ propsProjectNames = {}, history }) => {
           projectName={projectName}
           onChange={handleChange}
           onClick={validateAndSave}
-          errorMsg={errorMsg}
+          errorMsg={vErrorMsg}
           clearErrorMsg={clearErrorMsg} />
       )
     } else {
@@ -105,22 +111,27 @@ const Project: React.FC<IProps> = ({ propsProjectNames = {}, history }) => {
   }
 
   function renderProjectList() {
-    if (projectNames === undefined) {
-      return <Loader />
+    if (fetchError.getproject) {
+      return (<MessageTemplate message={errorMsg} />)
     }
-    if (projectNames !== undefined && projectNames !== null && projectNames.length > 0)
-      return (
-        projectNames.map((projectName, index) => (
-          <ProjectList
-            key={index}
-            projectName={projectName}
-            onClick={handleNavigation}
-          />
-        ))
-      )
     else {
-      return (<MessageTemplate message='Add New Project' />)
+      if (projectNames === null)
+        return <Loader />
+      else if (projectNames !== null && projectNames.length > 0)
+        return (
+          projectNames.map(({ name }, index) => (
+            <ProjectList
+              key={index}
+              projectName={name}
+              navigateTo={handleNavigation}
+              deleteProject={handleDeleteProject}
+            />
+          ))
+        )
+      else if (projectNames !== null && projectNames.length <= 0)
+        return (<MessageTemplate message='Add New Project' />)
     }
+
   }
 
   return (
@@ -136,7 +147,7 @@ const Project: React.FC<IProps> = ({ propsProjectNames = {}, history }) => {
             <AddButton
               float='right'
               active={openForm}
-              onClick={addProject} />
+              onClick={toggleForm} />
           </StyledFooter>
         </StyledListContainer>
       </StyledContainer>

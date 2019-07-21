@@ -17,6 +17,8 @@ const DoneButton: React.FC<IProps> = ({ onClick, success, isLoading }) => {
       return (
         <StyledLoadIcon />
       )
+    } else {
+      return <StyledDoneIcon />
     }
   }
   return (

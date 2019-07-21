@@ -12,10 +12,10 @@ import {
 import MenuButton from '../__StyledButton/Menu'
 import SidePanel from '../SidePanel'
 
-import EndpointDetails from '../../model/endpoint'
+import { ClientEndpointDetails } from '../../model/endpoint'
 
 interface IProps {
-  endpointDetails: EndpointDetails,
+  endpointDetails: ClientEndpointDetails,
   index: number,
   activeState: boolean,
   toggleActiveIndex: Function,
@@ -44,7 +44,7 @@ const EndpointList: React.FC<IProps> = ({
       <StyledEndpointList>
 
         <StyledRow>
-          <StyledSmallCloumn>{endpointDetails.method}</StyledSmallCloumn>
+          <StyledSmallCloumn>{endpointDetails.method.toLowerCase()}</StyledSmallCloumn>
           <StyledLargeColumn>{endpointDetails.endpoint}</StyledLargeColumn>
           <StyledSmallCloumn>
             <MenuButton

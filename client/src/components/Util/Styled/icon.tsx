@@ -11,6 +11,7 @@ import { Link2 as LinkIcon } from 'styled-icons/feather/Link2'
 import { Done } from 'styled-icons/material/Done'
 import { LoaderAlt as LoadIcon } from 'styled-icons/boxicons-regular/LoaderAlt'
 import { Server } from 'styled-icons/fa-solid/Server'
+import {RightArrowAlt as Go} from 'styled-icons/boxicons-regular/RightArrowAlt'
 
 const DefaultIcon = {
   width: '48%',
@@ -114,4 +115,12 @@ export const StyledLoadIcon = styled(LoadIcon)`
       transform: rotate(360deg);
     }
   }
+`
+
+export const StyledGoIcon = styled(Go)`
+  width: ${(props: IProps) =>
+    (props.width !== undefined ? props.width : DefaultIcon.width)};
+  height: ${(props: IProps) =>
+    (props.height !== undefined ? props.height : DefaultIcon.height)};
+  color: ${(props: IProps) => (props.active ? '#2196f3b3' : '#949292')};
 `

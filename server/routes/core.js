@@ -3,6 +3,7 @@ var utils = require('../utils')
 var SUCCESS_STATUS = 200;
 var ERROR_STATUS = 404;
 
+/* ------ FOR PROJECT SPECIFIC ------ */
 
 /* 
 NOTE:  
@@ -15,24 +16,6 @@ coreRoutes.get('/getprojectnames', (req, res) => {
   allProjects.then((projects) => {
     res.status(SUCCESS_STATUS)
     res.send(projects)
-  }).catch((err) => {
-    res.status(ERROR_STATUS)
-    res.send(err)
-  })
-})
-
-/* 
-NOTE:  
-ENDPOINT : /getproject/projectname
-PURPOSE : Spefic project details
-CORE ROUTE: Y
-*/
-coreRoutes.get('/getproject/:projectname', (req, res) => {
-  console.log(req.params.projectname)
-  var projectDetailse = utils.getProject(req.params.projectname)
-  projectDetailse.then((data) => {
-    res.status(SUCCESS_STATUS)
-    res.send(data)
   }).catch((err) => {
     res.status(ERROR_STATUS)
     res.send(err)
@@ -61,8 +44,46 @@ coreRoutes.post('/addnewproject', (req, res) => {
 
 /* 
 NOTE:  
+ENDPOINT : /delete/project
+PURPOSE : delete a project
+CORE ROUTE: Y
+*/
+coreRoutes.delete('/deleteproject', (req, res) => {
+  var data = req.body
+  utils.deleteProject(data).then((successMsg) => {
+    res.status(SUCCESS_STATUS)
+    res.send(successMsg)
+  }).catch((errMsg) => {
+    res.status(ERROR_STATUS)
+    res.send(errMsg)
+  })
+})
+
+
+
+/* ------ FOR ENDPOINT SPECIFIC ------ */
+
+/* 
+NOTE:  
+ENDPOINT : /getproject/projectname
+PURPOSE : Spefic Project Endpoint Details
+CORE ROUTE: Y
+*/
+coreRoutes.get('/getendpoints/:projectname', (req, res) => {
+  var projectDetailse = utils.getProjectEndpoints(req.params.projectname)
+  projectDetailse.then((data) => {
+    res.status(SUCCESS_STATUS)
+    res.send(data)
+  }).catch((err) => {
+    res.status(ERROR_STATUS)
+    res.send(err)
+  })
+})
+
+/* 
+NOTE:  
 ENDPOINT : /addendpoint/:projectname 
-PURPOSE : Save Endpoints inside a project
+PURPOSE : Save Endpoints in a Project
 CORE ROUTE: Y
 */
 coreRoutes.post('/addendpoint/:projectname', (req, res) => {
@@ -94,10 +115,10 @@ coreRoutes.post('/addendpoint/:projectname', (req, res) => {
 /* 
 NOTE:  
 ENDPOINT : /endpoint/:projectname
-PURPOSE : Edit endpoints of a project
+PURPOSE : Edit Endpoints of a Project
 CORE ROUTE: Y
 */
-coreRoutes.put('/endpoint/:projectname', (req, res) => {
+coreRoutes.put('/editendpoint/:projectname', (req, res) => {
   var projectname = req.params.projectname;
   var data = {
     endpoint: req.body.endpoint,
@@ -128,7 +149,7 @@ PURPOSE : delete an endpoint
 CORE ROUTE: Y
 */
 
-coreRoutes.delete('delete/:projectname', (req, res) => {
+coreRoutes.delete('deleteendpoint/:projectname', (req, res) => {
   var projectname = req.params.projectname
   if (projectname !== undefined && projectname !== null && projectname !== '') {
     var data = req.body;
@@ -143,22 +164,6 @@ coreRoutes.delete('delete/:projectname', (req, res) => {
   }
 })
 
-/* 
-NOTE:  
-ENDPOINT : /delete/project
-PURPOSE : delete a project
-CORE ROUTE: Y
-*/
 
-coreRoutes.delete('delete/project', (req, res) => {
-  var data = req.data
-  utils.deleteProject(data).then((successMsg) => {
-    res.status(SUCCESS_STATUS)
-    res.send(successMsg)
-  }).catch((errMsg) => {
-    res.status(ERROR_STATUS)
-    res.send(errMsg)
-  })
-})
 
 module.exports = coreRoutes      

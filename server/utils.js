@@ -53,13 +53,13 @@ var validateEndpointDetails = function (data) {
 /* ---- Filter & Convert Data For Client ---- */
 
 var filterProjectDetails = function (projectDetails) {
-  var newProjectDetails = { name: projectDetails.name, endpointlist: [] }
+  var newProjectDetails;
   if (projectDetails.endpointlist !== undefined && projectDetails.endpointlist.length > 0) {
-    newProjectDetails.endpointlist = projectDetails.endpointlist.map((data) => {
+    newProjectDetails = projectDetails.endpointlist.map((data) => {
       return {
         endpoint: data.endpoint,
         status: data.status,
-        response: JSON.stringify(data.response, null, 2),
+        response: data.response,
         method: data.method
       }
     })
@@ -101,7 +101,7 @@ var addNewProject = function (projectname) {
 var addEndPoint = function (projectname, data) {
   if (!isEndpointValid(data))
     return new Promise.reject(`invalid data`)
-    
+
   var endpointDetails = validateEndpointDetails(data)
   return new Promise((resolve, reject) => {
     Project.findOne({ name: projectname })
@@ -139,7 +139,7 @@ var getAllProjectNames = function () {
   })
 }
 
-var getProject = function (projectname) {
+var getProjectEndpoints = function (projectname) {
   if (checkIfDataExists(projectname)) {
     return new Promise((resolve, reject) => {
       Project.findOne({ name: projectname }, { _id: 0 }).then((projectDetails) => {
@@ -158,6 +158,7 @@ var editEndPoint = function (projectname, data) {
     return new Promise.reject(`invalid data`)
 
   var endpointDetails = validateEndpointDetails(data)
+  
   return new Promise((resolve, reject) => {
     Project.findOne({ name: projectname }).then((project) => {
       var endpointList = project.endpointlist
@@ -234,4 +235,4 @@ var getResponse = function (projectname, customroute, reqMethod) {
   })
 }
 
-module.exports = { addNewProject, addEndPoint, getResponse, getProject, editEndPoint, deleteEndPoint, deleteProject, getAllProjectNames };
+module.exports = { addNewProject, addEndPoint, getResponse, getProjectEndpoints, editEndPoint, deleteEndPoint, deleteProject, getAllProjectNames };

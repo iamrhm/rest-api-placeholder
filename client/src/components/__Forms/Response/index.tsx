@@ -7,12 +7,12 @@ import {
   StyledLeftColumn,
 } from "./styled";
 
-import EndpointDetails from '../../../model/endpoint'
+import { ClientEndpointDetails } from '../../../model/endpoint'
 import ErrorContainer from '../../Error'
 
 import DoneButton from '../../__StyledButton/DoneButton'
 interface IProps {
-  inputparams: EndpointDetails,
+  inputparams: ClientEndpointDetails,
   onChange: Function,
   onClick: Function,
   errorMsg: string,
@@ -54,7 +54,7 @@ const ResponseForm: React.FC<IProps> = ({ inputparams, onChange, onClick, errorM
           isLoading={false}
           onClick={onClick}
         />
-        
+
       </StyledLeftColumn>
       <StyledResponseInput
         readOnly={false}

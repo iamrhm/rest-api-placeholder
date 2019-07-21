@@ -4,7 +4,7 @@ import { StyledDeleteIcon } from '../../Util/Styled/icon'
 
 interface IProps {
   onClick: Function,
-  active: boolean,
+  active?: boolean,
 }
 
 const DeleteButton: React.FC<IProps> = ({ onClick, active }) => (
@@ -12,7 +12,7 @@ const DeleteButton: React.FC<IProps> = ({ onClick, active }) => (
     width='28px'
     height='28px'
     active={active}
-    onClick={(e: any) => onClick(e, 'delete')}>
+    onClick={(e) => onClick()}>
     <StyledDeleteIcon width='25px' height='26px' active={active} />
   </StyledRoundButton>
 )

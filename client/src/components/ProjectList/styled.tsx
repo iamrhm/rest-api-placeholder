@@ -32,6 +32,7 @@ export const StyledHeader = styled.div`
 export const StyledPara = styled.p`
   width: 92%;
   height: 70%;
+  position:relative;
   font-family: 'Open Sans';
   font-size: 17px;
   color: #3c3939f0;
@@ -49,4 +50,13 @@ export const StyledUrl = styled.span`
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   color: #272727a6;
 `
-
+export const StyledButtonWrapper = styled.span`
+  padding: 0 2%;
+  bottom: 10%;
+  right: 8%;
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 40%;
+`

@@ -34,8 +34,9 @@ export const StyledDefaultButton = styled.button`
   border-radius:  ${(props: IProps) =>
     (props.borderRadius !== undefined ? props.borderRadius : '0px')};
   :active{
-    transform:scale(.95)
-  }
+    transform:scale(.95);
+    color:'#2196f3b3';
+  };
   font-size: 18px;
   font-family: 'Open Sans';
   padding: 5%;
@@ -61,6 +62,7 @@ export const StyledRoundButton = styled.button`
   justify-content:center;
   align-content:center;
   :active{
-    transform:scale(.95)
+    transform:scale(.95);
+    color:'#2196f3b3';
   }
 `

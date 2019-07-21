@@ -1,11 +1,4 @@
-import EndpointDetails from '../model/endpoint'
-
-interface ServerEndpointDetails {
-  endpoint: string, status: number, response: object, method: string
-}
-interface ClientEndpointDetails {
-  endpoint: string, status: number, response: string, method: string
-}
+import { ClientEndpointDetails, ServerEndpointDetails } from '../model/endpoint'
 
 export function isValidJson(response: string) {
   let result: boolean = false
@@ -19,11 +12,13 @@ export function isValidJson(response: string) {
 
 
 export function parseServerToClientEndpointList(endpointArray: ServerEndpointDetails[]) {
-  let parsedEndpointArray: EndpointDetails[]
-  parsedEndpointArray = endpointArray.map((data) => {
-    return parseServerToClient(data)
-  }
-  )
+  let parsedEndpointArray: ClientEndpointDetails[]
+  if (endpointArray.length > 0)
+    parsedEndpointArray = endpointArray.map((data) => {
+      return parseServerToClient(data)
+    }
+    )
+  else parsedEndpointArray = []
   return parsedEndpointArray
 }
 
